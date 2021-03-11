@@ -1,0 +1,35 @@
+"use strict";
+
+const Accounts = require("./app/controllers/accounts");
+const GolfPOIMaintenance = require("./app/controllers/golfPOIMaintenance");
+
+module.exports = [
+  { method: "GET", path: "/", config: Accounts.index },
+  { method: "GET", path: "/signup", config: Accounts.showSignup },
+  { method: "GET", path: "/login", config: Accounts.showLogin },
+  { method: "GET", path: "/logout", config: Accounts.logout },
+  { method: "POST", path: "/signup", config: Accounts.signup },
+  { method: "POST", path: "/login", config: Accounts.login },
+  { method: 'GET', path: '/settings', config: Accounts.showSettings },
+  { method: 'POST', path: '/settings', config: Accounts.updateSettings },
+  { method: 'POST', path: '/courseUpdate/{courseId}', config: GolfPOIMaintenance.updateCourse },
+  { method: "GET", path: "/home", config: GolfPOIMaintenance.home },
+  { method: "POST", path: "/addCourse", config: GolfPOIMaintenance.addCourse },
+  { method: "GET", path: "/deleteCourse/{courseId}", config: GolfPOIMaintenance.deleteCourse },
+  { method: "GET", path: "/addImage/{courseId}", config: GolfPOIMaintenance.addImage },
+  { method: "GET", path: "/course/{courseId}", config: GolfPOIMaintenance.course },
+  { method: "GET", path: "/report", config: GolfPOIMaintenance.report },
+  { method: 'POST', path: '/uploadFile/{id}', config: GolfPOIMaintenance.uploadFile },
+  { method: 'GET', path: '/deleteimage/{id}/{courseId}', config: GolfPOIMaintenance.deleteImage },
+
+  {
+    method: "GET",
+    path: "/{param*}",
+    handler: {
+      directory: {
+        path: "./public",
+      },
+    },
+    options: { auth: false },
+  },
+];

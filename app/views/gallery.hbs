@@ -1,0 +1,20 @@
+<div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
+    {{> title-card title="Golf Courses of Ireland" subTitle="Course Gallary - Add an Image"}}
+    {{> main-menu }}
+</div>
+
+<div class="uk-container uk-margin">
+    <div class="uk-child-width-expand uk-flex-center uk-flex-middle uk-text-center" uk-grid>
+        <div class="uk-width-expand@m">
+            {{> upload }}
+        </div>
+    </div>
+</div>
+
+<div class="uk-container uk-padding-small">
+    <div class="uk-child-width-1-4@s uk-flex uk-flex-center" uk-grid uk-height-match="target: .uk-card">
+        {{#each images}}
+            {{> courseImages}}
+        {{/each}}
+    </div>
+</div>

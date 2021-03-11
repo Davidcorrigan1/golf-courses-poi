@@ -1,0 +1,20 @@
+<div>
+    <form action="/courseUpdate/{{course._id}}" method="POST">
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: user"></span>
+                <input class="uk-input uk-form-large" type="text" name="courseName" value="{{course.courseName}}">
+            </div>
+        </div>
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: user"></span>
+                <input class="uk-input uk-form-large" type="text" name="courseDesc" value="{{course.courseDesc}}">
+            </div>
+        </div>
+        <div class="uk-margin">
+            <button class="uk-button uk-button-primary uk-button-large uk-width-1-1">Save </button>
+        </div>
+    </form>
+    {{> error }}
+</div>

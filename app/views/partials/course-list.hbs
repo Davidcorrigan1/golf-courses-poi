@@ -1,0 +1,33 @@
+<div class="uk-margin uk-width-1xlarge uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
+  <table class="uk-table">
+    <caption>
+        <h3>Courses Entered to Date</h3>
+    </caption>
+    <thead>
+      <th>Course Name</th>
+      <th>Course Description</th>
+      <th>Updated By</th>
+      <th>Add Image</th>
+      <th>Delete</th>
+    </thead>
+    <tbody class="uk-text-left">
+      {{#each golfCourses}}
+        <tr>
+          <td>
+            <a href="/course/{{_id}}" >
+                {{courseName}}</td>
+          <td>{{courseDesc}}</td>
+          <td>{{lastUpdatedBy.firstName}} {{lastUpdatedBy.lastName}}</td>
+          <td>
+              <a href="/addImage/{{_id}}" >
+                  <span uk-icon="image"></span>
+          </td>
+          <td>
+              <a href="/deleteCourse/{{_id}}" >
+                  <i class="far fa-trash-alt"></i>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
