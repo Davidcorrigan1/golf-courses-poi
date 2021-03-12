@@ -2,17 +2,19 @@
 const Joi = require('@hapi/joi');
 const GolfPOI = require("../models/golfPOI");
 const User = require("../models/user");
+const LocationCategory = require("../models/locationCategory");
 const ImageStore = require("../utils/imageStore");
 
 const GolfPOIMaintenance = {
   home: {
-    handler: function (request, h) {
-      return h.view("home", { title: "Add a new Course" });
+    handler: async function (request, h) {
+      const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+      return h.view("home", { title: "Add a new Course" , categories: categories});
     },
   },
   report: {
     handler: async function (request, h) {
-      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").lean();
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy, category").lean();
       return h.view("report", {
         title: "GolfPOIMaintenance to Date",
         golfCourses: golfCourses,
@@ -25,10 +27,12 @@ const GolfPOIMaintenance = {
         const id = request.auth.credentials.id;
         const user = await User.findById(id);
         const data = request.payload;
+        const category = await LocationCategory.findByProvince(data.province);
         const newCourse = new GolfPOI({
           courseName: data.name,
           courseDesc: data.description,
           lastUpdatedBy: user._id,
+          category: category._id,
         });
         await newCourse.save();
         return h.redirect("/report");
@@ -61,14 +65,18 @@ const GolfPOIMaintenance = {
         courseImages = await ImageStore.getCourseImages(course.relatedImages)
       }
 
-      return h.view("gallery", {
+      return h.view("addImage", {
         title: "GolfPOIImage Image Update",
         course: course,
         images: courseImages
       });
     },
   },
-
+  // This method will handle the uploading of an image from the upload partial form. It receives the
+  // image in the payload and the course id in the param. It checks the an actual image is passed.
+  // It uploads the image to Cloudinary and uses the public id of the result to update in the
+  // array of ids in the relatedImages. It then saves the course document to the golfPOI collection.
+  // And finally redirects to the addImage view.
   uploadFile: {
     handler: async function(request, h) {
       try {
@@ -163,7 +171,49 @@ const GolfPOIMaintenance = {
         return h.view("main", {errors: [{message: err.message}]});
       }
     }
-  }
+  },
+  showCategory: {
+    handler: async function(request, h) {
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id).lean();
+        const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+        return h.view("category", { title: "Adding Categories", categories: categories, user: user });
+      } catch (err) {
+        return h.redirect("/report");
+      }
+    }
+  },
+  updateCategory: {
+    handler: async function (request, h) {
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const data = request.payload;
+        const validCountiesArray = data.validCounties.split(' ');
+        const newCategory = new LocationCategory({
+          province: data.province,
+          validCounties: validCountiesArray,
+          lastUpdatedBy: user._id,
+        });
+        await newCategory.save();
+        return h.redirect("/category");
+      } catch (err) {
+        return h.view("main", {errors: [{message: err.message}]});
+      }
+    }
+  },
+  deleteCategory: {
+    handler: async function (request, h) {
+      const id = request.auth.credentials.id;
+      const user = await User.findById(id);
+      const categoryId = request.params.categoryId;
+
+      const deleteCategory = await LocationCategory.findByIdAndDelete(categoryId).populate("user").lean();
+
+      return h.redirect("/category");
+    },
+  },
 };
 
 module.exports = GolfPOIMaintenance;

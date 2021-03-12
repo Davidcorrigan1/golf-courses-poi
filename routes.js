@@ -21,6 +21,9 @@ module.exports = [
   { method: "GET", path: "/report", config: GolfPOIMaintenance.report },
   { method: 'POST', path: '/uploadFile/{id}', config: GolfPOIMaintenance.uploadFile },
   { method: 'GET', path: '/deleteimage/{id}/{courseId}', config: GolfPOIMaintenance.deleteImage },
+  { method: 'GET', path: '/category', config: GolfPOIMaintenance.showCategory },
+  { method: 'POST', path: '/category', config: GolfPOIMaintenance.updateCategory },
+  { method: "GET", path: '/deleteCategory/{categoryId}', config: GolfPOIMaintenance.deleteCategory },
 
   {
     method: "GET",

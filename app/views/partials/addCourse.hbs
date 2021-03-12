@@ -14,6 +14,14 @@
               <input class="uk-input" id="form-stacked-text" type="text" name="description" placeholder="desc" />
           </div>
         </div>
+        <button class="uk-button uk-button-default" type="button">Provinces</button>
+        <div uk-select>
+              <select class="category" name="province">
+                  {{#each categories}}
+                      <option>{{province}}</option>
+                  {{/each}}
+              </select>
+        </div>
       </div>
       <div class=" uk-width-1-4@m uk-position-center-right" >
         <div class="uk-margin">

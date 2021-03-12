@@ -6,6 +6,7 @@
     <thead>
       <th>Course Name</th>
       <th>Course Description</th>
+      <th>Province</th>
       <th>Updated By</th>
       <th>Add Image</th>
       <th>Delete</th>
@@ -17,6 +18,7 @@
             <a href="/course/{{_id}}" >
                 {{courseName}}</td>
           <td>{{courseDesc}}</td>
+          <td>{{category.province}}</td>
           <td>{{lastUpdatedBy.firstName}} {{lastUpdatedBy.lastName}}</td>
           <td>
               <a href="/addImage/{{_id}}" >
