@@ -14,7 +14,7 @@ const GolfPOIMaintenance = {
   },
   report: {
     handler: async function (request, h) {
-      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy, category").lean();
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
       return h.view("report", {
         title: "GolfPOIMaintenance to Date",
         golfCourses: golfCourses,
