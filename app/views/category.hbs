@@ -1,8 +1,14 @@
-<div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
-    {{> title-card title="Golf Courses of Ireland" subTitle="Add a New Course Below"}}
-    {{> main-menu }}
+<div class="uk-container uk-margin-small">
+    {{> title-card}}
 </div>
 
+<div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
+    {{#if adminUser}}
+        {{> main-admin-menu }}
+    {{else}}
+        {{> main-menu }}
+    {{/if}}
+</div>
 <div class="uk-container uk-margin">
     <div class="uk-child-width-expand uk-flex-center uk-flex-middle uk-text-center" uk-grid>
         <div class="uk-width-expand@m">{{> addCategory}}</div>
