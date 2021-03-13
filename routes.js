@@ -25,8 +25,10 @@ module.exports = [
   { method: 'GET', path: '/category', config: GolfPOIMaintenance.showCategory },
   { method: 'POST', path: '/category', config: GolfPOIMaintenance.updateCategory },
   { method: "GET", path: '/deleteCategory/{categoryId}', config: GolfPOIMaintenance.deleteCategory },
-  { method: "GET", path: '/manageUsers', config: AdminFunction.manageUsers},
-//  { method: "GET", path: "/deleteUser/{id}", config: AdminFunction.deleteUser },
+  { method: "GET", path: '/manageUsers', config: AdminFunction.manageUsers },
+  { method: "GET", path: '/deleteUser/{id}', config: AdminFunction.deleteUser },
+  { method: "GET", path: '/userUpdate/{id}', config: AdminFunction.displayUser },
+  { method: "POST", path: '/userUpdate/{id}', config: AdminFunction.updateUser },
 
   {
     method: "GET",

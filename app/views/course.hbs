@@ -1,12 +1,13 @@
-<div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
-    {{> title-card title="Golf Courses of Ireland" subTitle="List Courses so far"}}
+<div class="uk-container uk-margin-small">
+    {{> title-card}}
+</div>
 
+<div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
     {{#if adminUser}}
         {{> main-admin-menu }}
     {{else}}
         {{> main-menu }}
     {{/if}}
-
 </div>
 
 <div class="uk-container uk-margin-small">

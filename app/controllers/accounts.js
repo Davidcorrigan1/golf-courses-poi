@@ -10,7 +10,10 @@ const Accounts = {
   index: {
     auth: false,
     handler: function(request, h) {
-      return h.view("main", { title: "Welcome to Donations" });
+      return h.view("main", {
+        title: "Golf Courses of Ireland",
+        subTitle: "Please sign up or login"
+      });
     }
   },
 
@@ -20,7 +23,10 @@ const Accounts = {
   showSignup: {
     auth: false,
     handler: function(request, h) {
-      return h.view("signup", { title: "Sign up for Donations" });
+      return h.view("signup", {
+        title: "Golf Courses of Ireland",
+        subTitle: "Sign up for you account here"
+      });
     }
   },
 
@@ -84,7 +90,10 @@ const Accounts = {
   showLogin: {
     auth: false,
     handler: function(request, h) {
-      return h.view("login", { title: "Login to Donations" });
+      return h.view("login", {
+        title: "Golf Courses of Ireland",
+        subTitle: "Login to your account here"
+      });
     }
   },
 
@@ -151,7 +160,11 @@ const Accounts = {
       try {
         const id = request.auth.credentials.id;
         const user = await User.findById(id).lean();
-        return h.view("settings", { title: "Donation Settings", user: user });
+        return h.view("settings", {
+          title: "Golf Courses of Ireland",
+          subTitle: "Sign up for you account here",
+          user: user
+        });
       } catch (err) {
         return h.view("login", { errors: [{ message: err.message }] });
       }
