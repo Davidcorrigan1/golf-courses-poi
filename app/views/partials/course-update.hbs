@@ -1,20 +1,36 @@
 <div>
-    <form action="/courseUpdate/{{course._id}}" method="POST">
-        <div class="uk-margin">
+    <form class="uk-form-stacked" action="/courseUpdate/{{course._id}}" method="POST">
+        <fieldset class="uk-fieldset">
+        <div class="uk-margin uk-fieldset uk-text-left">
+            <label class="uk-form-label" for="form-stacked-text">Update Course Name</label>
             <div class="uk-inline uk-width-1-1">
-                <span class="uk-form-icon" uk-icon="icon: user"></span>
+                <span class="uk-form-icon" uk-icon="icon: dribbble"></span>
                 <input class="uk-input uk-form-large" type="text" name="courseName" value="{{course.courseName}}">
             </div>
         </div>
-        <div class="uk-margin">
+        <div class="uk-margin uk-text-left">
+            <label class="uk-form-label" for="form-stacked-text">Enter Course Description</label>
             <div class="uk-inline uk-width-1-1">
-                <span class="uk-form-icon" uk-icon="icon: user"></span>
-                <input class="uk-input uk-form-large" type="text" name="courseDesc" value="{{course.courseDesc}}">
+                <span class="uk-form-icon" uk-icon="icon: dribbble"></span>
+                <input class="uk-input uk-form-large" id ="form-stacked-text" type="text" name="courseDesc" value="{{course.courseDesc}}">
             </div>
         </div>
-        <div class="uk-margin">
-            <button class="uk-button uk-button-primary uk-button-large uk-width-1-1">Save </button>
+        <div class="uk-margin uk-text-left">
+        <label class="uk-form-label" for="form-stacked-text">Update Provinces</label>
+            <div class="uk-inline uk-width-1-6">
+                <div uk-select>
+                    <select class="uk-select" name="province">
+                        {{#each categories}}
+                            <option>{{province}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
         </div>
+        <div class="uk-margin uk-text-left">
+            <button class="uk-button uk-button-primary uk-button-large uk-width-1-6">Save </button>
+        </div>
+        </fieldset>
     </form>
     {{> error }}
 </div>

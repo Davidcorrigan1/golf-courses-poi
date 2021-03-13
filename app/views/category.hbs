@@ -1,0 +1,19 @@
+<div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
+    {{> title-card title="Golf Courses of Ireland" subTitle="Add a New Course Below"}}
+    {{> main-menu }}
+</div>
+
+<div class="uk-container uk-margin">
+    <div class="uk-child-width-expand uk-flex-center uk-flex-middle uk-text-center" uk-grid>
+        <div class="uk-width-expand@m">{{> addCategory}}</div>
+    </div>
+</div>
+
+<div class="uk-container uk-margin-small">
+    <div class="uk-child-width-expand uk-flex-center uk-flex-middle uk-text-center " uk-grid>
+        <div class="uk-width-expand@m">
+            {{> category-list}}
+        </div>
+    </div>
+    {{> error }}
+</div>

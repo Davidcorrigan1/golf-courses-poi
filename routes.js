@@ -13,7 +13,7 @@ module.exports = [
   { method: 'GET', path: '/settings', config: Accounts.showSettings },
   { method: 'POST', path: '/settings', config: Accounts.updateSettings },
   { method: 'POST', path: '/courseUpdate/{courseId}', config: GolfPOIMaintenance.updateCourse },
-  { method: "GET", path: "/home", config: GolfPOIMaintenance.home },
+  { method: "GET", path: "/newCourse", config: GolfPOIMaintenance.newCourse },
   { method: "POST", path: "/addCourse", config: GolfPOIMaintenance.addCourse },
   { method: "GET", path: "/deleteCourse/{courseId}", config: GolfPOIMaintenance.deleteCourse },
   { method: "GET", path: "/addImage/{courseId}", config: GolfPOIMaintenance.addImage },
@@ -21,6 +21,9 @@ module.exports = [
   { method: "GET", path: "/report", config: GolfPOIMaintenance.report },
   { method: 'POST', path: '/uploadFile/{id}', config: GolfPOIMaintenance.uploadFile },
   { method: 'GET', path: '/deleteimage/{id}/{courseId}', config: GolfPOIMaintenance.deleteImage },
+  { method: 'GET', path: '/category', config: GolfPOIMaintenance.showCategory },
+  { method: 'POST', path: '/category', config: GolfPOIMaintenance.updateCategory },
+  { method: "GET", path: '/deleteCategory/{categoryId}', config: GolfPOIMaintenance.deleteCategory },
 
   {
     method: "GET",
