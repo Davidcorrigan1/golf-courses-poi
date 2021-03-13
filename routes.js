@@ -13,7 +13,7 @@ module.exports = [
   { method: 'GET', path: '/settings', config: Accounts.showSettings },
   { method: 'POST', path: '/settings', config: Accounts.updateSettings },
   { method: 'POST', path: '/courseUpdate/{courseId}', config: GolfPOIMaintenance.updateCourse },
-  { method: "GET", path: "/home", config: GolfPOIMaintenance.home },
+  { method: "GET", path: "/newCourse", config: GolfPOIMaintenance.newCourse },
   { method: "POST", path: "/addCourse", config: GolfPOIMaintenance.addCourse },
   { method: "GET", path: "/deleteCourse/{courseId}", config: GolfPOIMaintenance.deleteCourse },
   { method: "GET", path: "/addImage/{courseId}", config: GolfPOIMaintenance.addImage },

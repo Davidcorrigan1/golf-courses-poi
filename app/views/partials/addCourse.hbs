@@ -14,9 +14,10 @@
               <input class="uk-input" id="form-stacked-text" type="text" name="description" placeholder="desc" />
           </div>
         </div>
-        <button class="uk-button uk-button-default" type="button">Provinces</button>
+          <label class="uk-form-label" for="form-stacked-text">Provinces</label>
         <div uk-select>
-              <select class="category" name="province">
+              <select class="uk-select" name="province">
+                  <option value="" selected disabled hidden>Choose Province</option>
                   {{#each categories}}
                       <option>{{province}}</option>
                   {{/each}}

@@ -4,18 +4,33 @@ const Boom = require("@hapi/boom");
 const Joi = require('@hapi/joi');
 
 const Accounts = {
+  //----------------------------------------------------------------------------------------------
+  // This method displays the 'main' view.
+  //----------------------------------------------------------------------------------------------
   index: {
     auth: false,
     handler: function(request, h) {
       return h.view("main", { title: "Welcome to Donations" });
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method displays the 'signup' view.
+  //----------------------------------------------------------------------------------------------
   showSignup: {
     auth: false,
     handler: function(request, h) {
       return h.view("signup", { title: "Sign up for Donations" });
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method processes the 'signup' view. It firstly validate the data in the payload.
+  // It then checks the passed in email is not already registered. If it's not then it
+  // creates a user object with the data passed in for the view. It then saves the user
+  // object to the user collection and requests a cookie to be created with the id from the
+  // user just created. This will be used to authenticate the user on the other views.
+  //----------------------------------------------------------------------------------------------
   signup: {
     auth: false,
     validate: {
@@ -60,12 +75,24 @@ const Accounts = {
       }
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method displays the 'login' view.
+  //----------------------------------------------------------------------------------------------
   showLogin: {
     auth: false,
     handler: function(request, h) {
       return h.view("login", { title: "Login to Donations" });
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method processes the 'logon' view. It firstly validate the data in the payload.
+  // It then checks the passed in email is registered. If it is then it
+  // checks the payload password against the password on the user collection for the user.
+  // If the passwords match it requests a cookie to be created with the id from the
+  // user just created. This will be used to authenticate the user on the other views.
+  //----------------------------------------------------------------------------------------------
   login: {
     auth: false,
     validate: {
@@ -102,12 +129,21 @@ const Accounts = {
       }
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method redirects the 'main' view.
+  //----------------------------------------------------------------------------------------------
   logout: {
     handler: function(request, h) {
       request.cookieAuth.clear();
       return h.redirect("/");
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method displays the 'settings' view. Firstly it authenticates the user and retrieves
+  // the user data from the collection. It then calls the view passing the current user date to it.
+  //----------------------------------------------------------------------------------------------
   showSettings: {
     handler: async function(request, h) {
       try {
@@ -119,6 +155,12 @@ const Accounts = {
       }
     }
   },
+
+  //----------------------------------------------------------------------------------------------
+  // This method processes the 'settings' view. It firstly authenticates the user and retrieves
+  // the user data. It then updates the current user data with the updates passed in the payload.
+  // It then saves this data to the user collection and redisplays the 'settings' view.
+  //----------------------------------------------------------------------------------------------
   updateSettings: {
     validate: {
       payload: {
