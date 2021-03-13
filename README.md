@@ -32,9 +32,10 @@ This site was developed to allow uses to ad local courses.
 
 Here are the main features:
 * Authenication of users
-* Authenicated users can add new course 
-* They can add images to the course
-* They can update the course details
+* Authenticated users can add new course details
+* Authenticated users can update and delete course details
+* They can add/delete images to/from the course
+* They can add new categories and update categories
 
 ### Built With
 
