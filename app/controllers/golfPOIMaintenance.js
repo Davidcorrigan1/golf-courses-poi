@@ -12,22 +12,40 @@ const GolfPOIMaintenance = {
   //----------------------------------------------------------------------------------------
   newCourse: {
     handler: async function (request, h) {
+      const id = request.auth.credentials.id;
+      const user = await User.findById(id);
+      const adminUser = user.adminUser;
+
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
-      return h.view("newCourse", { title: "Add a new Course" , categories: categories});
+      return h.view("newCourse", {
+        title: "Add a new Course" ,
+        categories: categories,
+        adminUser: adminUser
+      });
     },
   },
 
   //----------------------------------------------------------------------------------------
   // This method will retrieve all the current courses from the GolfPOI collection. And it will
   // pass these to the 'report' view to display them.
+  // It also passes the adminUser the 'report' view so it can decide what options to show.
   //----------------------------------------------------------------------------------------
   report: {
     handler: async function (request, h) {
-      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
-      return h.view("report", {
-        title: "GolfPOIMaintenance to Date",
-        golfCourses: golfCourses,
-      });
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const adminUser = user.adminUser;
+
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        return h.view("report", {
+          title: "GolfPOIMaintenance to Date",
+          golfCourses: golfCourses,
+          adminUser: adminUser,
+        });
+      } catch (err) {
+        return h.view("main", { errors: [{ message: err.message }] });
+      }
     },
   },
 
@@ -107,6 +125,7 @@ const GolfPOIMaintenance = {
     handler: async function (request, h) {
       const id = request.auth.credentials.id;
       const user = await User.findById(id);
+      const adminUser = user.adminUser;
       const courseId = request.params.courseId;
       const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category").lean();
 
@@ -122,7 +141,8 @@ const GolfPOIMaintenance = {
       return h.view("addImage", {
         title: "GolfPOIImage Image Update",
         course: course,
-        images: courseImages
+        images: courseImages,
+        adminUser: adminUser
       });
     },
   },
@@ -186,6 +206,8 @@ const GolfPOIMaintenance = {
     handler: async function(request, h) {
       const id = request.auth.credentials.id;
       const user = await User.findById(id);
+      const adminUser = user.adminUser;
+
       const courseId = request.params.courseId;
       const course = await GolfPOI.findById(courseId).populate("user").populate("locationCategory").lean();
 
@@ -207,7 +229,8 @@ const GolfPOIMaintenance = {
         course: course,
         images: courseImages,
         categories: categories,
-        currentCategory: currentCategory
+        currentCategory: currentCategory,
+        adminUser: adminUser
       });
     }
   },
@@ -266,8 +289,14 @@ const GolfPOIMaintenance = {
       try {
         const id = request.auth.credentials.id;
         const user = await User.findById(id).lean();
+        const adminUser = user.adminUser;
+
         const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
-        return h.view("category", { title: "Adding Categories", categories: categories, user: user });
+        return h.view("category", {
+          title: "Adding Categories",
+          categories: categories,
+          user: user,
+          adminUser: adminUser});
       } catch (err) {
         return h.redirect("/report");
       }

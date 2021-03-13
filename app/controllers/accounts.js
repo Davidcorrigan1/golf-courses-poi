@@ -39,6 +39,7 @@ const Accounts = {
         lastName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().required(),
+        adminUser: Joi.boolean().required(),
       },
       options: {
         abortEarly: false,
@@ -65,7 +66,8 @@ const Accounts = {
           firstName: payload.firstName,
           lastName: payload.lastName,
           email: payload.email,
-          password: payload.password
+          password: payload.password,
+          adminUser: payload.adminUser
         });
         user = await newUser.save();
         request.cookieAuth.set({ id: user.id });

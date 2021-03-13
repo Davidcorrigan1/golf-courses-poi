@@ -2,6 +2,7 @@
 
 const Accounts = require("./app/controllers/accounts");
 const GolfPOIMaintenance = require("./app/controllers/golfPOIMaintenance");
+const AdminFunction = require("./app/controllers/adminFunction");
 
 module.exports = [
   { method: "GET", path: "/", config: Accounts.index },
@@ -24,6 +25,8 @@ module.exports = [
   { method: 'GET', path: '/category', config: GolfPOIMaintenance.showCategory },
   { method: 'POST', path: '/category', config: GolfPOIMaintenance.updateCategory },
   { method: "GET", path: '/deleteCategory/{categoryId}', config: GolfPOIMaintenance.deleteCategory },
+  { method: "GET", path: '/manageUsers', config: AdminFunction.manageUsers},
+//  { method: "GET", path: "/deleteUser/{id}", config: AdminFunction.deleteUser },
 
   {
     method: "GET",
