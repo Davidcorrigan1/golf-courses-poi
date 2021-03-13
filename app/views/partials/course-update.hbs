@@ -10,11 +10,14 @@
         </div>
         <div class="uk-margin uk-text-left">
             <label class="uk-form-label" for="form-stacked-text">Enter Course Description</label>
-            <div class="uk-inline uk-width-1-1">
-                <span class="uk-form-icon" uk-icon="icon: dribbble"></span>
-                <input class="uk-input uk-form-large" id ="form-stacked-text" type="text" name="courseDesc" value="{{course.courseDesc}}">
+            <div class="uk-form-row">
+                <div class="uk-inline uk-width-1-1">
+                    <span class="uk-form-icon" uk-icon="icon: dribbble"></span>
+                    <textarea name="courseDesc" rows="10" class="uk-input uk-form-large" >{{course.courseDesc}}</textarea>
+                </div>
             </div>
         </div>
+
         <div class="uk-margin uk-text-left">
         <label class="uk-form-label" for="form-stacked-text">Update Provinces</label>
             <div class="uk-inline uk-width-1-6">

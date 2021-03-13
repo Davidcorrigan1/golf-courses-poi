@@ -12,22 +12,42 @@ const GolfPOIMaintenance = {
   //----------------------------------------------------------------------------------------
   newCourse: {
     handler: async function (request, h) {
+      const id = request.auth.credentials.id;
+      const user = await User.findById(id);
+      const adminUser = user.adminUser;
+
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
-      return h.view("newCourse", { title: "Add a new Course" , categories: categories});
+      return h.view("newCourse", {
+        title: "Golf Courses of Ireland",
+        subTitle: "Add a new Course",
+        categories: categories,
+        adminUser: adminUser
+      });
     },
   },
 
   //----------------------------------------------------------------------------------------
   // This method will retrieve all the current courses from the GolfPOI collection. And it will
   // pass these to the 'report' view to display them.
+  // It also passes the adminUser the 'report' view so it can decide what options to show.
   //----------------------------------------------------------------------------------------
   report: {
     handler: async function (request, h) {
-      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
-      return h.view("report", {
-        title: "GolfPOIMaintenance to Date",
-        golfCourses: golfCourses,
-      });
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const adminUser = user.adminUser;
+
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        return h.view("report", {
+          title: "Golf Courses of Ireland",
+          subTitle: "List of Added courses to date",
+          golfCourses: golfCourses,
+          adminUser: adminUser,
+        });
+      } catch (err) {
+        return h.view("main", { errors: [{ message: err.message }] });
+      }
     },
   },
 
@@ -54,7 +74,8 @@ const GolfPOIMaintenance = {
       failAction: function (request, h, error) {
         return h
           .view("home", {
-            title: "Course update error",
+            title: "Golf Courses of Ireland",
+            subTitle: "Course update error",
             errors: error.details,
           })
           .takeover()
@@ -107,6 +128,7 @@ const GolfPOIMaintenance = {
     handler: async function (request, h) {
       const id = request.auth.credentials.id;
       const user = await User.findById(id);
+      const adminUser = user.adminUser;
       const courseId = request.params.courseId;
       const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category").lean();
 
@@ -120,9 +142,11 @@ const GolfPOIMaintenance = {
       }
 
       return h.view("addImage", {
-        title: "GolfPOIImage Image Update",
+        title: "Golf Courses of Ireland",
+        subTitle: "You can add Images here",
         course: course,
-        images: courseImages
+        images: courseImages,
+        adminUser: adminUser
       });
     },
   },
@@ -186,6 +210,8 @@ const GolfPOIMaintenance = {
     handler: async function(request, h) {
       const id = request.auth.credentials.id;
       const user = await User.findById(id);
+      const adminUser = user.adminUser;
+
       const courseId = request.params.courseId;
       const course = await GolfPOI.findById(courseId).populate("user").populate("locationCategory").lean();
 
@@ -203,11 +229,13 @@ const GolfPOIMaintenance = {
       const currentCategory = course.category.province;
 
       return h.view("course", {
-        title: "GolfPOIImage Image Update",
+        title: "Golf Courses of Ireland",
+        subTitle: "Update course details here",
         course: course,
         images: courseImages,
         categories: categories,
-        currentCategory: currentCategory
+        currentCategory: currentCategory,
+        adminUser: adminUser
       });
     }
   },
@@ -243,7 +271,7 @@ const GolfPOIMaintenance = {
         const courseId = request.params.courseId;
         const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category");
 
-        if (course.category.province != courseEdit.province) {
+        if ((!course.category) || (course.category.province != courseEdit.province)) {
           let category = await  LocationCategory.findByProvince(courseEdit.province);
           course.category = category.id;
         }
@@ -266,8 +294,16 @@ const GolfPOIMaintenance = {
       try {
         const id = request.auth.credentials.id;
         const user = await User.findById(id).lean();
+        const adminUser = user.adminUser;
+
         const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
-        return h.view("category", { title: "Adding Categories", categories: categories, user: user });
+        return h.view("category", {
+          title: "Golf Courses of Ireland",
+          subTitle: "Adding Categories",
+          categories: categories,
+          user: user,
+          adminUser: adminUser
+        });
       } catch (err) {
         return h.redirect("/report");
       }
