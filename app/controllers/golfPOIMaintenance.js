@@ -66,14 +66,14 @@ const GolfPOIMaintenance = {
       payload: {
         courseName: Joi.string().required(),
         courseDesc: Joi.string().required(),
-        province: Joi.string().required()
+        province: Joi.string().required(),
       },
       options: {
         abortEarly: false,
       },
       failAction: function (request, h, error) {
         return h
-          .view("home", {
+          .view("main", {
             title: "Golf Courses of Ireland",
             subTitle: "Course update error",
             errors: error.details,
@@ -89,8 +89,8 @@ const GolfPOIMaintenance = {
         const data = request.payload;
         const category = await LocationCategory.findByProvince(data.province);
         const newCourse = new GolfPOI({
-          courseName: data.name,
-          courseDesc: data.description,
+          courseName: data.courseName,
+          courseDesc: data.courseDesc,
           lastUpdatedBy: user._id,
           category: category._id,
         });
@@ -216,14 +216,20 @@ const GolfPOIMaintenance = {
       const course = await GolfPOI.findById(courseId).populate("user").populate("locationCategory").lean();
 
       let courseImages;
-      if (course.relatedImages !== undefined && course.relatedImages.length != 0) {
-        courseImages = await ImageStore.getCourseImages(course.relatedImages)
+      if (course.relatedImages) {
+        if (course.relatedImages !== undefined && course.relatedImages.length != 0)
+          {
+            courseImages = await ImageStore.getCourseImages(course.relatedImages)
+
+            for(let i=0; i < courseImages.length; i++){
+              courseImages[i].courseId = courseId;
+            }
+
+          }
       }
 
       // Adding the courseId to the array of images so it's available in the partial
-      for(let i=0; i < courseImages.length; i++){
-        courseImages[i].courseId = courseId;
-      }
+
 
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
       const currentCategory = course.category.province;
@@ -248,7 +254,7 @@ const GolfPOIMaintenance = {
       payload: {
         courseName: Joi.string().required(),
         courseDesc: Joi.string().required(),
-        province: Joi.string().required()
+        province: Joi.string().required(),
       },
       options: {
         abortEarly: false,
