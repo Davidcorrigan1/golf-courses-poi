@@ -96,7 +96,8 @@ const AdminFunction = {
     },
   },
   //----------------------------------------------------------------------------------------------
-  // This method will update the users details from an Admin account.
+  // This method will update the users details from an Admin account. It checks for an Admin
+  // account before any updates happen.
   //----------------------------------------------------------------------------------------------
   updateUser: {
     validate: {

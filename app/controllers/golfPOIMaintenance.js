@@ -203,15 +203,25 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method
+  // This method deletes an image from the imageStore and then deletes the link to the image
+  // from the course relatedImages array of ids.
+  // It then redirects to the 'addImage' view.
   //----------------------------------------------------------------------------------------------
   deleteImage: {
     handler: async function(request, h) {
       try {
         await ImageStore.deleteImage(request.params.id);
+
         const courseId = request.params.courseId;
+
+        // Retrieve the course document from the golfPOI collection.
         const updateCourse = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category");
-        const allImages = await ImageStore.getAllImages();
+
+        // Find the array element matching the image id and remove from the relatedImages array
+        // Then save the course document back to the collection.
+        const elementId = updateCourse.relatedImages.indexOf(request.params.id);
+        const removedItem = updateCourse.relatedImages.splice(elementId,1);
+        await updateCourse.save();
 
         return h.redirect("/addImage/" + courseId);
 
@@ -222,7 +232,11 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will retrieve and display course details which can be updated.
+  // It retrieve the course document details from the golfPOI collection for id passed in
+  // It will then check if the related images array has some elements.
+  // If it has elements it uses the array to get the actual related images from the ImageStore.
+  // It then adds the course id to the array of images for the course.
   //----------------------------------------------------------------------------------------------
   course: {
     handler: async function(request, h) {
@@ -239,6 +253,7 @@ const GolfPOIMaintenance = {
           {
             courseImages = await ImageStore.getCourseImages(course.relatedImages)
 
+            // Adding the courseId to the array of images so it's available in the partial
             for(let i=0; i < courseImages.length; i++){
               courseImages[i].courseId = courseId;
             }
@@ -246,12 +261,11 @@ const GolfPOIMaintenance = {
           }
       }
 
-      // Adding the courseId to the array of images so it's available in the partial
-
-
+      // Retrieves the categories from the collection of categories. And also assign the current category
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
       const currentCategory = course.category.province;
 
+      //Retrieve the list of golf courses and count them for the stats on the admin user dashboard
       const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
       const courseCount = golfCourses.length;
 
@@ -269,7 +283,8 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will be called from the 'course' view when an update is done to course details.
+  // It validates the input and then handler to update the course details.
   //----------------------------------------------------------------------------------------------
   updateCourse: {
     validate: {
@@ -301,10 +316,13 @@ const GolfPOIMaintenance = {
         const courseId = request.params.courseId;
         const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category");
 
+        // From the category picked it finds the related id.
         if ((!course.category) || (course.category.province != courseEdit.province)) {
           let category = await  LocationCategory.findByProvince(courseEdit.province);
           course.category = category.id;
         }
+
+        // Updates the course document
         course.courseName = courseEdit.courseName;
         course.courseDesc = courseEdit.courseDesc;
         course.lastUpdatedBy = user._id;
@@ -314,6 +332,7 @@ const GolfPOIMaintenance = {
           coordinates: [courseEdit.longitude,courseEdit.latitude]
         },
         await course.save();
+
         return h.redirect("/report");
       } catch (err) {
         return h.view("main", {errors: [{message: err.message}]});
@@ -322,7 +341,8 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will display the 'category' view
+  // It retrieves an array of categories from the locationCategory collection.
   //----------------------------------------------------------------------------------------------
   showCategory: {
     handler: async function(request, h) {
@@ -351,7 +371,8 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will be called when a category is added from the 'category' view'
+  // It will construct a category object and save to the collection.
   //----------------------------------------------------------------------------------------------
   updateCategory: {
     handler: async function (request, h) {
@@ -366,6 +387,7 @@ const GolfPOIMaintenance = {
           lastUpdatedBy: user._id,
         });
         await newCategory.save();
+
         return h.redirect("/category");
       } catch (err) {
         return h.view("category", {errors: [{message: err.message}]});

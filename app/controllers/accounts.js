@@ -153,7 +153,7 @@ const Accounts = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method redirects the 'main' view.
+  // This method logs the user out by clear the cookie and redirects the 'main' view.
   //----------------------------------------------------------------------------------------------
   logout: {
     handler: function(request, h) {
