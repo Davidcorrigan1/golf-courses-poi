@@ -17,11 +17,16 @@ const GolfPOIMaintenance = {
       const adminUser = user.adminUser;
 
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+      const courseCount = golfCourses.length;
+
       return h.view("newCourse", {
         title: "Golf Courses of Ireland",
         subTitle: "Add a new Course",
         categories: categories,
-        adminUser: adminUser
+        adminUser: adminUser,
+        courseCount: courseCount
       });
     },
   },
@@ -39,11 +44,14 @@ const GolfPOIMaintenance = {
         const adminUser = user.adminUser;
 
         const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
+
         return h.view("report", {
           title: "Golf Courses of Ireland",
           subTitle: "List of Added courses to date",
           golfCourses: golfCourses,
           adminUser: adminUser,
+          courseCount: courseCount
         });
       } catch (err) {
         return h.view("main", { errors: [{ message: err.message }] });
@@ -66,14 +74,16 @@ const GolfPOIMaintenance = {
       payload: {
         courseName: Joi.string().required(),
         courseDesc: Joi.string().required(),
-        province: Joi.string().required()
+        province: Joi.string().required(),
+        longitude: Joi.number().required(),
+        latitude: Joi.number().required(),
       },
       options: {
         abortEarly: false,
       },
       failAction: function (request, h, error) {
         return h
-          .view("home", {
+          .view("main", {
             title: "Golf Courses of Ireland",
             subTitle: "Course update error",
             errors: error.details,
@@ -89,10 +99,14 @@ const GolfPOIMaintenance = {
         const data = request.payload;
         const category = await LocationCategory.findByProvince(data.province);
         const newCourse = new GolfPOI({
-          courseName: data.name,
-          courseDesc: data.description,
+          courseName: data.courseName,
+          courseDesc: data.courseDesc,
           lastUpdatedBy: user._id,
           category: category._id,
+          location: {
+            type: 'Point',
+            coordinates: [data.longitude,data.latitude]
+          },
         });
         await newCourse.save();
         return h.redirect("/report");
@@ -135,18 +149,22 @@ const GolfPOIMaintenance = {
       let courseImages;
       if (course.relatedImages !== undefined && course.relatedImages.length != 0) {
         courseImages = await ImageStore.getCourseImages(course.relatedImages)
+
+        for(let i=0; i < courseImages.length; i++){
+          courseImages[i].courseId = courseId;
+        }
       }
 
-      for(let i=0; i < courseImages.length; i++){
-        courseImages[i].courseId = courseId;
-      }
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+      const courseCount = golfCourses.length;
 
       return h.view("addImage", {
         title: "Golf Courses of Ireland",
         subTitle: "You can add Images here",
         course: course,
         images: courseImages,
-        adminUser: adminUser
+        adminUser: adminUser,
+        courseCount: courseCount
       });
     },
   },
@@ -185,15 +203,25 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method
+  // This method deletes an image from the imageStore and then deletes the link to the image
+  // from the course relatedImages array of ids.
+  // It then redirects to the 'addImage' view.
   //----------------------------------------------------------------------------------------------
   deleteImage: {
     handler: async function(request, h) {
       try {
         await ImageStore.deleteImage(request.params.id);
+
         const courseId = request.params.courseId;
+
+        // Retrieve the course document from the golfPOI collection.
         const updateCourse = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category");
-        const allImages = await ImageStore.getAllImages();
+
+        // Find the array element matching the image id and remove from the relatedImages array
+        // Then save the course document back to the collection.
+        const elementId = updateCourse.relatedImages.indexOf(request.params.id);
+        const removedItem = updateCourse.relatedImages.splice(elementId,1);
+        await updateCourse.save();
 
         return h.redirect("/addImage/" + courseId);
 
@@ -204,7 +232,11 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will retrieve and display course details which can be updated.
+  // It retrieve the course document details from the golfPOI collection for id passed in
+  // It will then check if the related images array has some elements.
+  // If it has elements it uses the array to get the actual related images from the ImageStore.
+  // It then adds the course id to the array of images for the course.
   //----------------------------------------------------------------------------------------------
   course: {
     handler: async function(request, h) {
@@ -216,17 +248,26 @@ const GolfPOIMaintenance = {
       const course = await GolfPOI.findById(courseId).populate("user").populate("locationCategory").lean();
 
       let courseImages;
-      if (course.relatedImages !== undefined && course.relatedImages.length != 0) {
-        courseImages = await ImageStore.getCourseImages(course.relatedImages)
+      if (course.relatedImages) {
+        if (course.relatedImages !== undefined && course.relatedImages.length != 0)
+          {
+            courseImages = await ImageStore.getCourseImages(course.relatedImages)
+
+            // Adding the courseId to the array of images so it's available in the partial
+            for(let i=0; i < courseImages.length; i++){
+              courseImages[i].courseId = courseId;
+            }
+
+          }
       }
 
-      // Adding the courseId to the array of images so it's available in the partial
-      for(let i=0; i < courseImages.length; i++){
-        courseImages[i].courseId = courseId;
-      }
-
+      // Retrieves the categories from the collection of categories. And also assign the current category
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
       const currentCategory = course.category.province;
+
+      //Retrieve the list of golf courses and count them for the stats on the admin user dashboard
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+      const courseCount = golfCourses.length;
 
       return h.view("course", {
         title: "Golf Courses of Ireland",
@@ -235,20 +276,24 @@ const GolfPOIMaintenance = {
         images: courseImages,
         categories: categories,
         currentCategory: currentCategory,
-        adminUser: adminUser
+        adminUser: adminUser,
+        courseCount: courseCount
       });
     }
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will be called from the 'course' view when an update is done to course details.
+  // It validates the input and then handler to update the course details.
   //----------------------------------------------------------------------------------------------
   updateCourse: {
     validate: {
       payload: {
         courseName: Joi.string().required(),
         courseDesc: Joi.string().required(),
-        province: Joi.string().required()
+        province: Joi.string().required(),
+        longitude: Joi.number().required(),
+        latitude: Joi.number().required(),
       },
       options: {
         abortEarly: false,
@@ -271,14 +316,23 @@ const GolfPOIMaintenance = {
         const courseId = request.params.courseId;
         const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category");
 
+        // From the category picked it finds the related id.
         if ((!course.category) || (course.category.province != courseEdit.province)) {
           let category = await  LocationCategory.findByProvince(courseEdit.province);
           course.category = category.id;
         }
+
+        // Updates the course document
         course.courseName = courseEdit.courseName;
         course.courseDesc = courseEdit.courseDesc;
         course.lastUpdatedBy = user._id;
+
+        course.location = {
+          type: 'Point',
+          coordinates: [courseEdit.longitude,courseEdit.latitude]
+        },
         await course.save();
+
         return h.redirect("/report");
       } catch (err) {
         return h.view("main", {errors: [{message: err.message}]});
@@ -287,7 +341,8 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will display the 'category' view
+  // It retrieves an array of categories from the locationCategory collection.
   //----------------------------------------------------------------------------------------------
   showCategory: {
     handler: async function(request, h) {
@@ -297,12 +352,17 @@ const GolfPOIMaintenance = {
         const adminUser = user.adminUser;
 
         const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
+
         return h.view("category", {
           title: "Golf Courses of Ireland",
           subTitle: "Adding Categories",
           categories: categories,
           user: user,
-          adminUser: adminUser
+          adminUser: adminUser,
+          courseCount: courseCount
         });
       } catch (err) {
         return h.redirect("/report");
@@ -311,7 +371,8 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------------
-  // This method will
+  // This method will be called when a category is added from the 'category' view'
+  // It will construct a category object and save to the collection.
   //----------------------------------------------------------------------------------------------
   updateCategory: {
     handler: async function (request, h) {
@@ -326,6 +387,7 @@ const GolfPOIMaintenance = {
           lastUpdatedBy: user._id,
         });
         await newCategory.save();
+
         return h.redirect("/category");
       } catch (err) {
         return h.view("category", {errors: [{message: err.message}]});
