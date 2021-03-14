@@ -22,18 +22,22 @@ const AdminFunction = {
 
       if (user.adminUser) {
         const allUsers = await User.find().lean();
-        for (let i=1; i < allUsers.length; i++) {
+        for (let i=0; i < allUsers.length; i++) {
           if (!allUsers[i].adminUser) {
             userArray.push(allUsers[i]);
           }
         }
         const adminUser = user.adminUser;
 
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
+
         return h.view("manageUsers", {
             title: "Golf Courses of Ireland",
             subTitle: "Manage User Accounts",
             userArray: userArray,
             adminUser: adminUser,
+            courseCount: courseCount
         });
       } else {
         const message = "User is not Authorised";

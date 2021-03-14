@@ -17,11 +17,16 @@ const GolfPOIMaintenance = {
       const adminUser = user.adminUser;
 
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+      const courseCount = golfCourses.length;
+
       return h.view("newCourse", {
         title: "Golf Courses of Ireland",
         subTitle: "Add a new Course",
         categories: categories,
-        adminUser: adminUser
+        adminUser: adminUser,
+        courseCount: courseCount
       });
     },
   },
@@ -39,11 +44,14 @@ const GolfPOIMaintenance = {
         const adminUser = user.adminUser;
 
         const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
+
         return h.view("report", {
           title: "Golf Courses of Ireland",
           subTitle: "List of Added courses to date",
           golfCourses: golfCourses,
           adminUser: adminUser,
+          courseCount: courseCount
         });
       } catch (err) {
         return h.view("main", { errors: [{ message: err.message }] });
@@ -67,6 +75,8 @@ const GolfPOIMaintenance = {
         courseName: Joi.string().required(),
         courseDesc: Joi.string().required(),
         province: Joi.string().required(),
+        longitude: Joi.number().required(),
+        latitude: Joi.number().required(),
       },
       options: {
         abortEarly: false,
@@ -93,6 +103,10 @@ const GolfPOIMaintenance = {
           courseDesc: data.courseDesc,
           lastUpdatedBy: user._id,
           category: category._id,
+          location: {
+            type: 'Point',
+            coordinates: [data.longitude,data.latitude]
+          },
         });
         await newCourse.save();
         return h.redirect("/report");
@@ -135,18 +149,22 @@ const GolfPOIMaintenance = {
       let courseImages;
       if (course.relatedImages !== undefined && course.relatedImages.length != 0) {
         courseImages = await ImageStore.getCourseImages(course.relatedImages)
+
+        for(let i=0; i < courseImages.length; i++){
+          courseImages[i].courseId = courseId;
+        }
       }
 
-      for(let i=0; i < courseImages.length; i++){
-        courseImages[i].courseId = courseId;
-      }
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+      const courseCount = golfCourses.length;
 
       return h.view("addImage", {
         title: "Golf Courses of Ireland",
         subTitle: "You can add Images here",
         course: course,
         images: courseImages,
-        adminUser: adminUser
+        adminUser: adminUser,
+        courseCount: courseCount
       });
     },
   },
@@ -234,6 +252,9 @@ const GolfPOIMaintenance = {
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
       const currentCategory = course.category.province;
 
+      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+      const courseCount = golfCourses.length;
+
       return h.view("course", {
         title: "Golf Courses of Ireland",
         subTitle: "Update course details here",
@@ -241,7 +262,8 @@ const GolfPOIMaintenance = {
         images: courseImages,
         categories: categories,
         currentCategory: currentCategory,
-        adminUser: adminUser
+        adminUser: adminUser,
+        courseCount: courseCount
       });
     }
   },
@@ -255,6 +277,8 @@ const GolfPOIMaintenance = {
         courseName: Joi.string().required(),
         courseDesc: Joi.string().required(),
         province: Joi.string().required(),
+        longitude: Joi.number().required(),
+        latitude: Joi.number().required(),
       },
       options: {
         abortEarly: false,
@@ -284,6 +308,11 @@ const GolfPOIMaintenance = {
         course.courseName = courseEdit.courseName;
         course.courseDesc = courseEdit.courseDesc;
         course.lastUpdatedBy = user._id;
+
+        course.location = {
+          type: 'Point',
+          coordinates: [courseEdit.longitude,courseEdit.latitude]
+        },
         await course.save();
         return h.redirect("/report");
       } catch (err) {
@@ -303,12 +332,17 @@ const GolfPOIMaintenance = {
         const adminUser = user.adminUser;
 
         const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
+
         return h.view("category", {
           title: "Golf Courses of Ireland",
           subTitle: "Adding Categories",
           categories: categories,
           user: user,
-          adminUser: adminUser
+          adminUser: adminUser,
+          courseCount: courseCount
         });
       } catch (err) {
         return h.redirect("/report");

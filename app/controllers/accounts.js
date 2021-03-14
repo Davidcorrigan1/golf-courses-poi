@@ -1,5 +1,6 @@
 "use strict";
 const User = require("../models/user");
+const GolfPOI = require("../models/golfPOI");
 const Boom = require("@hapi/boom");
 const Joi = require('@hapi/joi');
 
@@ -68,12 +69,18 @@ const Accounts = {
           const message = "Email address is already registered";
           throw Boom.badData(message);
         }
+
+        const currentDate = new Date().toISOString().slice(0,10);
+        console.log("Date: " + currentDate);
+
         const newUser = new User({
           firstName: payload.firstName,
           lastName: payload.lastName,
           email: payload.email,
           password: payload.password,
-          adminUser: payload.adminUser
+          adminUser: payload.adminUser,
+          loginCount: 1,
+          lastLoginDate: currentDate
         });
         user = await newUser.save();
         request.cookieAuth.set({ id: user.id });
@@ -134,6 +141,10 @@ const Accounts = {
         }
         user.comparePassword(password);
         request.cookieAuth.set({ id: user.id });
+
+        user.loginCount += 1;
+        user.save();
+
         return h.redirect("/report");
       } catch (err) {
         return h.view("login", { errors: [{ message: err.message }] });
@@ -160,10 +171,16 @@ const Accounts = {
       try {
         const id = request.auth.credentials.id;
         const user = await User.findById(id).lean();
+
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
+
         return h.view("settings", {
           title: "Golf Courses of Ireland",
           subTitle: "Sign up for you account here",
-          user: user
+          user: user,
+          adminUser: user.adminUser,
+          courseCount: courseCount
         });
       } catch (err) {
         return h.view("login", { errors: [{ message: err.message }] });
