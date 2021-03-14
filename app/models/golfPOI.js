@@ -15,6 +15,10 @@ const golfPOISchema = new Schema({
     ref: "LocationCategory",
   },
   relatedImages: [],
+  location: {
+    type: {type: String, default: 'Point'},
+    coordinates: {type: [Number], default: [0,0]}
+  },
 });
 
 golfPOISchema.statics.findById = function(id) {
