@@ -4,6 +4,7 @@ const GolfPOI = require("../models/golfPOI");
 const User = require("../models/user");
 const LocationCategory = require("../models/locationCategory");
 const ImageStore = require("../utils/imageStore");
+const WeatherAPI = require("../utils/weatherAPI");
 
 const GolfPOIMaintenance = {
   //----------------------------------------------------------------------------------------
@@ -261,6 +262,9 @@ const GolfPOIMaintenance = {
           }
       }
 
+      // Retrieves current Weather at location coordinates.
+      const currentWeather = await WeatherAPI.getWeather(course.location.coordinates[0], course.location.coordinates[1]);
+
       // Retrieves the categories from the collection of categories. And also assign the current category
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
       const currentCategory = course.category.province;
@@ -277,7 +281,8 @@ const GolfPOIMaintenance = {
         categories: categories,
         currentCategory: currentCategory,
         adminUser: adminUser,
-        courseCount: courseCount
+        courseCount: courseCount,
+        currentWeather: currentWeather
       });
     }
   },
