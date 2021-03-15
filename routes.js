@@ -29,6 +29,7 @@ module.exports = [
   { method: "GET", path: '/deleteUser/{id}', config: AdminFunction.deleteUser },
   { method: "GET", path: '/userUpdate/{id}', config: AdminFunction.displayUser },
   { method: "POST", path: '/userUpdate/{id}', config: AdminFunction.updateUser },
+  { method: "GET", path: "/reportCategory/{categoryId}", config: GolfPOIMaintenance.reportCategory },
 
   {
     method: "GET",
