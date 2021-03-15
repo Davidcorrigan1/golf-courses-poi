@@ -1,5 +1,11 @@
 <div class="uk-container uk-margin-small">
-    {{> title-card}}
+    {{> title-card subTitle=course.courseName}}
+</div>
+
+<div class="uk-container uk-margin-small">
+    {{#if currentWeather}}
+        {{> course-weather}}
+    {{/if}}
 </div>
 
 <div class="uk-flex uk-flex-center uk-flex-middle uk-grid-small" uk-grid>
