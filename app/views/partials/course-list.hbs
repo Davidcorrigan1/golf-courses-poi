@@ -1,8 +1,6 @@
 <div class="uk-margin uk-width-1xlarge uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
   <table class="uk-table">
-    <caption>
-        <h3>Courses Entered to Date</h3>
-    </caption>
+
     <thead>
       <th>Course Name</th>
       <th>Course Description</th>
@@ -18,7 +16,8 @@
             <a href="/course/{{_id}}" >
                 {{courseName}}</td>
           <td>{{courseDesc}}</td>
-          <td>{{category.province}}</td>
+          <td><a href="/reportCategory/{{category._id}}" >
+              {{category.province}}</td>
           <td>{{lastUpdatedBy.firstName}} {{lastUpdatedBy.lastName}}</td>
           <td>
               <a href="/addImage/{{_id}}" >
