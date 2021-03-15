@@ -262,7 +262,8 @@ const GolfPOIMaintenance = {
           }
       }
 
-      await WeatherAPI.getWeather(course.location.coordinates[0], course.location.coordinates[1]);
+      // Retrieves current Weather at location coordinates.
+      const currentWeather = await WeatherAPI.getWeather(course.location.coordinates[0], course.location.coordinates[1]);
 
       // Retrieves the categories from the collection of categories. And also assign the current category
       const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
@@ -280,7 +281,8 @@ const GolfPOIMaintenance = {
         categories: categories,
         currentCategory: currentCategory,
         adminUser: adminUser,
-        courseCount: courseCount
+        courseCount: courseCount,
+        currentWeather: currentWeather
       });
     }
   },
