@@ -27,21 +27,30 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This site was developed to allow uses to ad local courses.
+This site was developed as a POI web application for Golf Courses of Ireland. Users can use the app to add details of course courses
+to the Database along with the coordinates of the course and some images.
 
 
 Here are the main features:
-* Authenication of users
-* Authenticated users can add new course details
+* Authentication of users. 
+    * A user can be a normal user who can add/update/delete course data
+    * Or a Admin user who has addition functionality around user admin and statistics. An admin user can see all normal user details and update and delete them.
+    They can check a users login count and last date of login. They also see stats on the number of POI golf courses added to the system.
+* Authenticated users can add new course details, name description and coordinates.
 * Authenticated users can update and delete course details
-* They can add/delete images to/from the course
+* They can add/delete images to/from the course listing.
 * They can add new categories and update categories
+* Courses can be filtered by category at the click of a button.
+* On the edit course page the current course weather will also be displayed.
 
 ### Built With
 
-This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+This section lists major platforms, frameworks and technologies that were used to build the project using. 
 * [Bootstrap](https://getbootstrap.com)
 * [Node.js](https://nodejs.org)
+* [hapi](https://hapi.dev/)
+* [Handlebars](https://handlebarsjs.com/)* [Mongoose](https://mongoosejs.com/)
+* [uikit](https://getuikit.com/)
 
 
 
@@ -49,9 +58,18 @@ This section should list any major frameworks that you built your project using.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
+
 To get a local copy up and running follow these simple example steps.
 
+1. An .env file will need the following entries
+    * name=cloudinary User Name
+    * key=Cloudinary Key
+    * secret=Cloudinary Secret Key
+    * cookie_name=golfPOI-web
+    * cookie_password=a password
+    * db=mongodb://localhost/golfCoursePOI
+    * api_key=open weather api key
+    
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
@@ -65,24 +83,12 @@ This is an example of how to list things you need to use the software and how to
 1. Details to be added
 2. Clone the repo
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   git clone https://github.com/Davidcorrigan1/golf-courses-poi.git
    ```
 3. Install NPM packages
    ```sh
    npm install
    ```
-4. Enter your API in `config.js`
-   ```JS
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
 
 
 <!-- CONTRIBUTING -->
@@ -109,7 +115,8 @@ Distributed under the WIT License.
 
 
 
-Project Link: [https://github.com/davidcorrigan1/repo_name](https://github.com/davidcorrigan1/repo_name)
+Project Link: [https://github.com/davidcorrigan1/golf-courses-poi](https://github.com/davidcorrigan1/golf-courses-poi
+)
 
 
 
