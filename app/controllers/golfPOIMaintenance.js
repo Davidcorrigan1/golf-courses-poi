@@ -61,6 +61,37 @@ const GolfPOIMaintenance = {
   },
 
   //----------------------------------------------------------------------------------------
+  // This method will retrieve all the courses from the GolfPOI collection for a specific category.
+  // And it will pass these to the 'reportCategory' view to display them.
+  // It also passes the adminUser the 'report' view so it can decide what options to show.
+  //----------------------------------------------------------------------------------------
+  reportCategory: {
+    handler: async function (request, h) {
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const adminUser = user.adminUser;
+
+        const categoryId = request.params.categoryId;
+        const golfCourses = await GolfPOI.findByCategory(categoryId).populate("lastUpdatedBy").populate("category").lean();
+
+        const allCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = allCourses.length;
+
+        return h.view("report", {
+          title: "Golf Courses of Ireland",
+          subTitle: "List of Added courses for category",
+          golfCourses: golfCourses,
+          adminUser: adminUser,
+          courseCount: courseCount
+        });
+      } catch (err) {
+        return h.view("main", { errors: [{ message: err.message }] });
+      }
+    },
+  },
+
+  //----------------------------------------------------------------------------------------
   // This method is called from the 'newCourse' view within the 'addCourse' partial which
   // the user uses to add a new course. It is passed in courseName, courseDesc and province
   // which are validated.

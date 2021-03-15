@@ -25,4 +25,8 @@ golfPOISchema.statics.findById = function(id) {
   return this.findOne({ _id : id});
 };
 
+golfPOISchema.statics.findByCategory = function(categoryId) {
+  return this.find({ category : categoryId});
+};
+
 module.exports = Mongoose.model("GolfPOI", golfPOISchema);
