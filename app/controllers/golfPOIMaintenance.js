@@ -13,22 +13,26 @@ const GolfPOIMaintenance = {
   //----------------------------------------------------------------------------------------
   newCourse: {
     handler: async function (request, h) {
-      const id = request.auth.credentials.id;
-      const user = await User.findById(id);
-      const adminUser = user.adminUser;
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const adminUser = user.adminUser;
 
-      const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
+        const categories = await LocationCategory.find().populate("lastUpdatedBy").lean();
 
-      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
-      const courseCount = golfCourses.length;
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
 
-      return h.view("newCourse", {
-        title: "Golf Courses of Ireland",
-        subTitle: "Add a new Course",
-        categories: categories,
-        adminUser: adminUser,
-        courseCount: courseCount
-      });
+        return h.view("newCourse", {
+          title: "Golf Courses of Ireland",
+          subTitle: "Add a new Course",
+          categories: categories,
+          adminUser: adminUser,
+          courseCount: courseCount
+        });
+      } catch (err) {
+        return h.view("main", { errors: [{ message: err.message }] });
+      };
     },
   },
 
@@ -157,47 +161,57 @@ const GolfPOIMaintenance = {
   //----------------------------------------------------------------------------------------
   deleteCourse: {
     handler: async function (request, h) {
-      const id = request.auth.credentials.id;
-      const user = await User.findById(id);
-      const courseId = request.params.courseId;
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const courseId = request.params.courseId;
 
-      const deleteCourse = await GolfPOI.findByIdAndDelete(courseId).populate("user").lean();
+        const deleteCourse = await GolfPOI.findByIdAndDelete(courseId).populate("user").lean();
 
-      return h.redirect("/report");
+        return h.redirect("/report");
+      } catch (err) {
+        return h.view("main", { errors: [{ message: err.message }] });
+      }
     },
   },
 
   //----------------------------------------------------------------------------------------
-  // This method
+  // This method display the 'addImage' view which is the view which enables the user
+  // to upload an image linked to a course. It retrieves the course details and all
+  // the current related images.
   //----------------------------------------------------------------------------------------
   addImage: {
     handler: async function (request, h) {
-      const id = request.auth.credentials.id;
-      const user = await User.findById(id);
-      const adminUser = user.adminUser;
-      const courseId = request.params.courseId;
-      const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category").lean();
+      try {
+        const id = request.auth.credentials.id;
+        const user = await User.findById(id);
+        const adminUser = user.adminUser;
+        const courseId = request.params.courseId;
+        const course = await GolfPOI.findById(courseId).populate("lastUpdatedBy").populate("category").lean();
 
-      let courseImages;
-      if (course.relatedImages !== undefined && course.relatedImages.length != 0) {
-        courseImages = await ImageStore.getCourseImages(course.relatedImages)
+        let courseImages;
+        if (course.relatedImages !== undefined && course.relatedImages.length != 0) {
+          courseImages = await ImageStore.getCourseImages(course.relatedImages)
 
-        for(let i=0; i < courseImages.length; i++){
-          courseImages[i].courseId = courseId;
+          for(let i=0; i < courseImages.length; i++){
+            courseImages[i].courseId = courseId;
+          }
         }
-      }
 
-      const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
-      const courseCount = golfCourses.length;
+        const golfCourses = await GolfPOI.find().populate("lastUpdatedBy").populate("category").lean();
+        const courseCount = golfCourses.length;
 
-      return h.view("addImage", {
-        title: "Golf Courses of Ireland",
-        subTitle: "You can add Images here",
-        course: course,
-        images: courseImages,
-        adminUser: adminUser,
-        courseCount: courseCount
-      });
+        return h.view("addImage", {
+          title: "Golf Courses of Ireland",
+          subTitle: "You can add Images here",
+          course: course,
+          images: courseImages,
+          adminUser: adminUser,
+          courseCount: courseCount
+        });
+      } catch (err) {
+        return h.view("main", { errors: [{ message: err.message }] });
+      };
     },
   },
 

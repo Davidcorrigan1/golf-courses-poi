@@ -1,6 +1,11 @@
 const axios = require("axios");
 const env = require('dotenv');
 
+//-------------------------------------------------------------------------------------------------
+// The getWeather(long,lat) will use the open weather api to retrieve weather at given longitude
+// and latitude coordinates. It will return a weather object with details.
+//-------------------------------------------------------------------------------------------------
+
 const WeatherAPI = {
   getWeather: async function(longitude, latitude) {
     const lon = longitude;
