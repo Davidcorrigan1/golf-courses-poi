@@ -142,6 +142,8 @@ const Accounts = {
         user.comparePassword(password);
         request.cookieAuth.set({ id: user.id });
 
+        const currentDate = new Date().toISOString().slice(0,10);
+        user.lastLoginDate = currentDate;
         user.loginCount += 1;
         user.save();
 
